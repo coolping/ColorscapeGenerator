@@ -12,15 +12,17 @@ system = platform.system()
 print(system)
 if system == 'Windows':
 
-    ser = serial.Serial('COM10', 921600)    
+    ser = serial.Serial('COM11', 115200)    
 else:
-    #ser = serial.Serial('/dev/ttyUSB0', 115200) 
-    ser = serial.Serial('/dev/ttyAMA0', 115200) 
+    ser = serial.Serial('/dev/ttyUSB0', 921600) 
+    #ser = serial.Serial('/dev/ttyAMA10', baudrate=115200,timeout=1) #ttyAMA10 is DebugPort
 ser.flushInput()
+
 
 # Pygame 
 pygame.init()
 
+pygame.mouse.set_visible(False)
 
 info = pygame.display.Info()
 
@@ -30,6 +32,7 @@ print("Current resolution : ", resolution)
 
 #screen = pygame.display.set_mode((300, 420))
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
 clock = pygame.time.Clock()
 
 # read ini
@@ -62,7 +65,7 @@ class MovingSquare:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.square_size = 50
+        self.square_size = 200
         self.square_x = random.randint(0, self.width - self.square_size)
         self.square_y = random.randint(0, self.height - self.square_size)
         self.speed = random.uniform(10, 15)
@@ -72,7 +75,6 @@ class MovingSquare:
         self.square_x += self.speed * math.cos(self.angle)
         self.square_y += self.speed * math.sin(self.angle)
 
-        # 碰撞檢測
         if self.square_x <= 0 or self.square_x >= self.width - self.square_size:
             self.angle = math.pi - self.angle
         if self.square_y <= 0 or self.square_y >= self.height - self.square_size:
@@ -81,14 +83,11 @@ class MovingSquare:
     def draw(self, screen):
         pygame.draw.rect(screen, WHITE, (self.square_x, self.square_y, self.square_size, self.square_size))
 # Create MovingSquare class
-WIDTH, HEIGHT = 800, 600
 moving_square = MovingSquare(info.current_w, info.current_h)
 
-
-
 running = True
-
 pattern_target = re.compile(r'Pattern_Change = (\d+)')
+
 
 while running:
     # check serial data
@@ -150,7 +149,7 @@ while running:
             
             screen.blit(image, (0, 0))  # show the picture
         elif current_color.startswith("square"):
-            screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+            #screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             
             # update the square position
             moving_square.update()
@@ -164,10 +163,13 @@ while running:
             screen.fill(colors[current_color])
     pygame.display.flip()
 
-    clock.tick(30)
+    clock.tick(60)
 print("close")
 pygame.quit()
 ser.close()
 
-    
-        
+
+
+
+
+
