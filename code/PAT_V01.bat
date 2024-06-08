@@ -1,2 +1,2 @@
-python3 %~n0.py
+python38 %~n0.py
 pause
